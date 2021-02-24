@@ -18,6 +18,10 @@ RoxygenNote: 7.1.1
 Imports: 
     EloChoice,
     rptR,
+    Rcpp
 Depends: 
     EloRating,
     R (>= 3.4.0)
+LinkingTo: 
+    Rcpp,
+    RcppArmadillo
