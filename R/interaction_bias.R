@@ -1,6 +1,9 @@
 
 #' interaction bias in interaction matrix
 #'
+#' correlation between rank/score distance and interaction numbers and
+#' coefficient of variation between interactions of individuals
+#'
 #' @param m input matrix (square)
 #' @param ranking_by character, the ranking method to be used (so far, only
 #'        \code{"DS"} is supported)

@@ -4,7 +4,7 @@
 \alias{simple_steep_gen}
 \title{generate dominance matrix with specified steepness}
 \usage{
-simple_steep_gen(n_ind, n_int, steep, id_bias = TRUE, rank_bias = TRUE)
+simple_steep_gen(n_ind, n_int, steep, id_bias = 0, rank_bias = 0)
 }
 \arguments{
 \item{n_ind}{integer, the number of individuals}
@@ -13,12 +13,13 @@ simple_steep_gen(n_ind, n_int, steep, id_bias = TRUE, rank_bias = TRUE)
 
 \item{steep}{numeric (between 0 and 1), the desired steepness value}
 
-\item{id_bias}{logical, should some individuals be more observed than others
-(default is \code{TRUE}). Can also be a numeric of the same length as
-\code{n_ind} with actual weights.}
+\item{id_bias}{numeric, between 0 and 1. If 0 all individual are equally
+likely to interact. If 1, some individuals have higher propensities
+to interact}
 
-\item{rank_bias}{logical, should closer ranked dyads interact more often than
-dyads that are more distant in rank (default is \code{TRUE})}
+\item{rank_bias}{numeric, between 0 and 1. If 0 there is no relationship
+between rank distance and interaction propensity. If 1 there is a
+strong relationship: dyads closer in rank interact more often.}
 }
 \value{
 a list with the first item being the interactions in sequence form,
@@ -32,19 +33,12 @@ res <- simple_steep_gen(n_ind = 5, n_int = 30, steep = 0.99)
 res$sequence
 res$matrix
 
-# with prespecified weights
-res <- simple_steep_gen(n_ind = 5,
-                        n_int = 100,
-                        steep = 0.95,
-                        rank_bias = TRUE,
-                        id_bias = c(1, 0.1, 0.1, 0.1, 0.1))
-res$matrix
 
 library(EloRating)
 steeps <- runif(20, 0, 1)
 nids <- sample(6:10, length(steeps), TRUE)
 mats <- sapply(1:length(steeps), function(x) {
-  simple_steep_gen(nids[x], nids[x] ^ 2.5, steeps[x], FALSE)[[2]]
+  simple_steep_gen(nids[x], nids[x] ^ 2.5, steeps[x], 0)[[2]]
  })
 obs_steeps <- unlist(lapply(mats, function(x)steepness(x)[1]))
 plot(steeps, obs_steeps, xlim = c(0, 1), ylim = c(0, 1))

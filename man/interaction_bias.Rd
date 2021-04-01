@@ -23,7 +23,8 @@ randomizations are returned in the results}
 a list
 }
 \description{
-interaction bias in interaction matrix
+correlation between rank/score distance and interaction numbers and
+coefficient of variation between interactions of individuals
 }
 \examples{
 data(bonobos)

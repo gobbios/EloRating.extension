@@ -4,7 +4,7 @@
 \alias{simple_steep_gen_alternating}
 \title{generate dominance matrix with specified steepness}
 \usage{
-simple_steep_gen_alternating(n_ind, n_int, steeps, id_bias = TRUE)
+simple_steep_gen_alternating(n_ind, n_int, steeps, id_bias = 0, rank_bias = 0)
 }
 \arguments{
 \item{n_ind}{integer, the number of individuals}
@@ -14,9 +14,13 @@ simple_steep_gen_alternating(n_ind, n_int, steeps, id_bias = TRUE)
 \item{steeps}{numeric (between 0 and 1), the desired steepness values. The
 length of this vector determines how many periods will be generated.}
 
-\item{id_bias}{logical, should some individuals be more observed than others
-(default is \code{TRUE}). Can also be a numeric of the same length as
-\code{n_ind}.}
+\item{id_bias}{numeric, between 0 and 1. If 0 all individual are equally
+likely to interact. If 1, some individuals have higher propensities
+to interact}
+
+\item{rank_bias}{numeric, between 0 and 1. If 0 there is no relationship
+between rank distance and interaction propensity. If 1 there is a
+strong relationship: dyads closer in rank interact more often.}
 }
 \value{
 a list with the first item being the interactions in sequence form
@@ -24,6 +28,10 @@ and the second item as matrix
 }
 \description{
 generate dominance matrix with specified steepness
+}
+\details{
+In essence, this is just a wrapper for
+\code{\link{simple_steep_gen}}.
 }
 \examples{
 simple_steep_gen_alternating(n_ind = 3, n_int = 10, steeps = c(0.3, 0.9))
