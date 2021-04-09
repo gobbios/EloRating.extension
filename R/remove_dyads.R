@@ -1,9 +1,11 @@
 #' remove interactions from matrix to increase sparseness
 #' @importFrom EloRating prunk
 #' @param m input matrix
-#' @param by_interaction logical, should interactions be removed interaction by
-#'        interaction, or by removing one dyad entirely at a time
-#' @param stop_at numeric, fractions of unknown relationships to be reached
+#' @param removal_mode character, should interactions be removed interaction by
+#'        interaction (\code{"by_interaction"}), or by removing one dyad
+#'        entirely at a time (\code{"by_dyad"}). Default is \code{"mix"}, i.e.
+#'        a random mix between the two strategies.
+#' @param stop_at numeric, fraction of unknown relationships to be reached
 #' @param max_out numeric, the number of matrices to be returned maximally.
 #'        This is useful if the input matrix is fairly large. If set, this
 #'        will return the input matrix plus \code{max_out} randomly selected
@@ -25,9 +27,12 @@
 #' res$summary
 
 remove_dyads <- function(m,
-                         by_interaction = FALSE,
+                         removal_mode = c("mix", "by_interaction", "by_dyad"),
                          stop_at = 0.5,
                          max_out = NULL) {
+
+  removal_mode <- match.arg(removal_mode)
+
   # some prep
   diag(m)[is.na(diag(m))] <- 0
   if (any(diag(m) != 0)) {
@@ -47,30 +52,36 @@ remove_dyads <- function(m,
   }
   # prepare output
   outdata <- data.frame(step = (min_remove - 1):max_remove, prunk = NA)
+  if (removal_mode == "mix") {
+    outdata$by_interaction <- sample(c(TRUE, FALSE), size = nrow(outdata), replace = TRUE)
+  }
+  if (removal_mode == "by_interaction") {
+    outdata$by_interaction <- TRUE
+  }
+  if (removal_mode == "by_dyad") {
+    outdata$by_interaction <- FALSE
+  }
+  outdata$by_interaction[1] <- NA
   outmats <- list(m)
 
-  # do it per interaction
-  if (by_interaction) {
-    current_prunk <- prunk(m)[1]
-    outdata$prunk[1] <- current_prunk
-    for (i in 2:nrow(outdata)) {
+  for (i in 2:nrow(outdata)) {
+    if (outdata$by_interaction[i]) {
+      current_prunk <- prunk(m)[1]
       done <- FALSE
       while (!done) {
+        # select cells and remove interactions until one more dyad has zero interactions
         cell <- sample(which(m > 0), 1)
         m[cell] <- m[cell] - 1
-        test_prunk <- prunk(m)[1]
-        if (test_prunk > current_prunk) {
+        new_prunk <- prunk(m)[1]
+        if (new_prunk > current_prunk) {
           outmats[[length(outmats) + 1]] <- m
-          current_prunk <- test_prunk
           done <- TRUE
         }
       }
+      has_i <- apply(dyads, 1, function(x) m[x[1], x[2]] + m[x[2], x[1]]) > 0
     }
-  }
 
-  # do it per dyad
-  if (!by_interaction) {
-    for (i in (min_remove:max_remove)) {
+    if (!outdata$by_interaction[i]) {
       d <- sample(seq_len(nrow(dyads)), 1, prob = has_i)
       m[dyads[d, 1], dyads[d, 2]] <- 0
       m[dyads[d, 2], dyads[d, 1]] <- 0

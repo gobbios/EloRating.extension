@@ -4,15 +4,22 @@
 \alias{remove_dyads}
 \title{remove interactions from matrix to increase sparseness}
 \usage{
-remove_dyads(m, by_interaction = FALSE, stop_at = 0.5, max_out = NULL)
+remove_dyads(
+  m,
+  removal_mode = c("mix", "by_interaction", "by_dyad"),
+  stop_at = 0.5,
+  max_out = NULL
+)
 }
 \arguments{
 \item{m}{input matrix}
 
-\item{by_interaction}{logical, should interactions be removed interaction by
-interaction, or by removing one dyad entirely at a time}
+\item{removal_mode}{character, should interactions be removed interaction by
+interaction (\code{"by_interaction"}), or by removing one dyad
+entirely at a time (\code{"by_dyad"}). Default is \code{"mix"}, i.e.
+a random mix between the two strategies.}
 
-\item{stop_at}{numeric, fractions of unknown relationships to be reached}
+\item{stop_at}{numeric, fraction of unknown relationships to be reached}
 
 \item{max_out}{numeric, the number of matrices to be returned maximally.
 This is useful if the input matrix is fairly large. If set, this
